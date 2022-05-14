@@ -1,0 +1,35 @@
+version: '>= 0.14.0'
+
+formatter: markdown table
+
+content: |-
+  [![Tests](https://github.com/netascode/terraform-nxos-evpn/actions/workflows/test.yml/badge.svg)](https://github.com/netascode/terraform-nxos-evpn/actions/workflows/test.yml)
+
+  # Terraform NX-OS EVPN Module
+
+  Manages NX-OS EVPN
+
+  Model Documentation: [Link](https://developer.cisco.com/docs/cisco-nexus-3000-and-9000-series-nx-api-rest-sdk-user-guide-and-api-reference-release-9-3x/#!configuring-vxlan-bgp-evpn)
+
+  ## Examples
+
+  ```hcl
+  {{ include "./examples/complete/main.tf" }}
+  ```
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Resources }}
+
+output:
+  file: README.md
+  mode: replace
+
+sort:
+  enabled: false
