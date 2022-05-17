@@ -6,7 +6,7 @@ terraform {
 
     nxos = {
       source  = "netascode/nxos"
-      version = ">= 0.3.8"
+      version = ">= 0.3.11"
     }
   }
 }
@@ -30,197 +30,282 @@ resource "nxos_feature_evpn" "evpn" {
 module "main" {
   source = "../.."
 
-  admin_state                      = true
-  advertise_virtual_mac            = true
-  hold_down_time                   = 123
-  host_reachability_protocol       = "bgp"
-  ingress_replication_protocol_bgp = true
-  source_interface                 = "lo0"
-  suppress_arp                     = true
-  suppress_mac_route               = false
   vnis = [
     {
-      vni           = 10
-      associate_vrf = true
+      vni                 = 1001
+      route_distinguisher = "1:1"
+      route_target_import = ["1.1.1.1:1", "65535:1", "65536:123"]
+      route_target_export = ["1.1.1.1:1", "65535:1", "65536:123"]
     },
     {
-      vni           = 11
-      associate_vrf = true
-    },
-    {
-      vni             = 12
-      multicast_group = "239.1.1.1"
-    },
-    {
-      vni                          = 13
-      ingress_replication_protocol = "bgp"
-      suppress_arp                 = "enabled"
-    },
-    {
-      vni                          = 14
-      ingress_replication_protocol = "unknown"
+      vni                    = 1002
+      route_distinguisher    = "auto"
+      route_target_both_auto = true
     }
   ]
 
   depends_on = [
-    nxos_feature_evpn.evpn
+    nxos_feature_evpn.evpn,
+    nxos_feature_bgp.bgp
   ]
 }
 
-data "nxos_nve_interface" "nvoEp" {
+data "nxos_evpn" "rtctrlL2Evpn" {
   depends_on = [module.main]
 }
 
-resource "test_assertions" "nvoEp" {
-  component = "nvoEp"
+resource "test_assertions" "rtctrlL2Evpn" {
+  component = "rtctrlL2Evpn"
 
   equal "admin_state" {
     description = "admin_state"
-    got         = data.nxos_nve_interface.nvoEp.admin_state
-    want        = "enabled"
-  }
-
-  equal "advertise_virtual_mac" {
-    description = "advertise_virtual_mac"
-    got         = data.nxos_nve_interface.nvoEp.advertise_virtual_mac
-    want        = true
-  }
-
-  equal "hold_down_time" {
-    description = "hold_down_time"
-    got         = data.nxos_nve_interface.nvoEp.hold_down_time
-    want        = 123
-  }
-
-  equal "host_reachability_protocol" {
-    description = "host_reachability_protocol"
-    got         = data.nxos_nve_interface.nvoEp.host_reachability_protocol
-    want        = "bgp"
-  }
-
-  equal "ingress_replication_protocol_bgp" {
-    description = "ingress_replication_protocol_bgp"
-    got         = data.nxos_nve_interface.nvoEp.ingress_replication_protocol_bgp
-    want        = true
-  }
-
-  equal "multisite_source_interface" {
-    description = "multisite_source_interface"
-    got         = data.nxos_nve_interface.nvoEp.multisite_source_interface
-    want        = "unspecified"
-  }
-
-  equal "source_interface" {
-    description = "source_interface"
-    got         = data.nxos_nve_interface.nvoEp.source_interface
-    want        = "lo0"
-  }
-
-  equal "suppress_arp" {
-    description = "suppress_arp"
-    got         = data.nxos_nve_interface.nvoEp.suppress_arp
-    want        = true
-  }
-
-  equal "suppress_mac_route" {
-    description = "suppress_mac_route"
-    got         = data.nxos_nve_interface.nvoEp.suppress_mac_route
-    want        = false
-  }
-}
-
-data "nxos_nve_vni" "nvoNw12" {
-  vni = 12
-
-  depends_on = [module.main]
-}
-
-resource "test_assertions" "nvoNw12" {
-  component = "nvoNw12"
-
-  equal "vni" {
-    description = "vni"
-    got         = data.nxos_nve_vni.nvoNw12.vni
-    want        = 12
-  }
-
-  equal "associate_vrf" {
-    description = "associate_vrf"
-    got         = data.nxos_nve_vni.nvoNw12.associate_vrf
-    want        = false
-  }
-
-  equal "multicast_group" {
-    description = "multicast_group"
-    got         = data.nxos_nve_vni.nvoNw12.multicast_group
-    want        = "239.1.1.1"
-  }
-
-  equal "multisite_ingress_replication" {
-    description = "multisite_ingress_replication"
-    got         = data.nxos_nve_vni.nvoNw12.multisite_ingress_replication
-    want        = "disable"
-  }
-
-  equal "suppress_arp" {
-    description = "suppress_arp"
-    got         = data.nxos_nve_vni.nvoNw12.suppress_arp
-    want        = "off"
-  }
-}
-
-data "nxos_nve_vni" "nvoNw13" {
-  vni = 13
-
-  depends_on = [module.main]
-}
-
-resource "test_assertions" "nvoNw13" {
-  component = "nvoNw13"
-
-  equal "vni" {
-    description = "vni"
-    got         = data.nxos_nve_vni.nvoNw13.vni
-    want        = 13
-  }
-
-  equal "associate_vrf" {
-    description = "associate_vrf"
-    got         = data.nxos_nve_vni.nvoNw13.associate_vrf
-    want        = false
-  }
-
-  equal "multicast_group" {
-    description = "multicast_group"
-    got         = data.nxos_nve_vni.nvoNw13.multicast_group
-    want        = "0.0.0.0"
-  }
-
-  equal "multisite_ingress_replication" {
-    description = "multisite_ingress_replication"
-    got         = data.nxos_nve_vni.nvoNw13.multisite_ingress_replication
-    want        = "disable"
-  }
-
-  equal "suppress_arp" {
-    description = "suppress_arp"
-    got         = data.nxos_nve_vni.nvoNw13.suppress_arp
+    got         = data.nxos_evpn.rtctrlL2Evpn.admin_state
     want        = "enabled"
   }
 }
 
-data "nxos_nve_vni_ingress_replication" "nvoIngRepl" {
-  vni = 13
-
+data "nxos_evpn_vni" "rtctrlBDEvi_1001" {
+  encap      = "vxlan-1001"
   depends_on = [module.main]
 }
 
-resource "test_assertions" "nvoIngRepl" {
-  component = "nvoIngRepl"
+resource "test_assertions" "rtctrlBDEvi_1001" {
+  component = "rtctrlBDEvi_1001"
 
-  equal "protocol" {
-    description = "protocol"
-    got         = data.nxos_nve_vni_ingress_replication.nvoIngRepl.protocol
-    want        = "bgp"
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni.rtctrlBDEvi_1001.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "route_distinguisher" {
+    description = "route_distinguisher"
+    got         = data.nxos_evpn_vni.rtctrlBDEvi_1001.route_distinguisher
+    want        = "rd:as2-nn2:1:1"
+  }
+}
+
+data "nxos_evpn_vni" "rtctrlBDEvi_1002" {
+  encap      = "vxlan-1002"
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "rtctrlBDEvi_1002" {
+  component = "rtctrlBDEvi_1002"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni.rtctrlBDEvi_1002.encap
+    want        = "vxlan-1002"
+  }
+
+  equal "route_distinguisher" {
+    description = "route_distinguisher"
+    got         = data.nxos_evpn_vni.rtctrlBDEvi_1002.route_distinguisher
+    want        = "rd:unknown:0:0"
+  }
+}
+
+data "nxos_evpn_vni_route_target_direction" "rtctrlRttP_1001_import" {
+  encap      = "vxlan-1001"
+  direction  = "import"
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttP_1001_import" {
+  component = "rtctrlRttP_1001_import"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1001_import.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1001_import.direction
+    want        = "import"
+  }
+}
+
+data "nxos_evpn_vni_route_target_direction" "rtctrlRttP_1001_export" {
+  encap      = "vxlan-1001"
+  direction  = "export"
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttP_1001_export" {
+  component = "rtctrlRttP_1001_export"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1001_export.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1001_export.direction
+    want        = "export"
+  }
+}
+
+data "nxos_evpn_vni_route_target_direction" "rtctrlRttP_1002_import" {
+  encap      = "vxlan-1002"
+  direction  = "import"
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttP_1002_import" {
+  component = "rtctrlRttP_1002_import"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1002_import.encap
+    want        = "vxlan-1002"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1002_import.direction
+    want        = "import"
+  }
+}
+
+data "nxos_evpn_vni_route_target_direction" "rtctrlRttP_1002_export" {
+  encap      = "vxlan-1002"
+  direction  = "export"
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttP_1002_export" {
+  component = "rtctrlRttP_1002_export"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1002_export.encap
+    want        = "vxlan-1002"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target_direction.rtctrlRttP_1002_export.direction
+    want        = "export"
+  }
+}
+
+data "nxos_evpn_vni_route_target" "rtctrlRttEntry_import_65535_1" {
+  encap        = "vxlan-1001"
+  direction    = "import"
+  route_target = "route-target:as2-nn2:65535:1"
+  depends_on   = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttEntry_import_65535_1" {
+  component = "rtctrlRttEntry_import_65535_1"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65535_1.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65535_1.direction
+    want        = "import"
+  }
+
+  equal "route_target" {
+    description = "route_target"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65535_1.route_target
+    want        = "route-target:as2-nn2:65535:1"
+  }
+}
+
+data "nxos_evpn_vni_route_target" "rtctrlRttEntry_import_65536_123" {
+  encap        = "vxlan-1001"
+  direction    = "import"
+  route_target = "route-target:as4-nn2:65536:123"
+  depends_on   = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttEntry_import_65536_123" {
+  component = "rtctrlRttEntry_import_65536_123"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65536_123.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65536_123.direction
+    want        = "import"
+  }
+
+  equal "route_target" {
+    description = "route_target"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_65536_123.route_target
+    want        = "route-target:as4-nn2:65536:123"
+  }
+}
+
+data "nxos_evpn_vni_route_target" "rtctrlRttEntry_import_1111_1" {
+  encap        = "vxlan-1001"
+  direction    = "import"
+  route_target = "route-target:ipv4-nn2:1.1.1.1:1"
+  depends_on   = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttEntry_import_1111_1" {
+  component = "rtctrlRttEntry_import_1111_1"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_1111_1.encap
+    want        = "vxlan-1001"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_1111_1.direction
+    want        = "import"
+  }
+
+  equal "route_target" {
+    description = "route_target"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_1111_1.route_target
+    want        = "route-target:ipv4-nn2:1.1.1.1:1"
+  }
+}
+
+data "nxos_evpn_vni_route_target" "rtctrlRttEntry_import_auto" {
+  encap        = "vxlan-1002"
+  direction    = "import"
+  route_target = "route-target:unknown:0:0"
+  depends_on   = [module.main]
+}
+
+resource "test_assertions" "rtctrlRttEntry_import_auto" {
+  component = "rtctrlRttEntry_import_1111_1"
+
+  equal "encap" {
+    description = "encap"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_auto.encap
+    want        = "vxlan-1002"
+  }
+
+  equal "direction" {
+    description = "direction"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_auto.direction
+    want        = "import"
+  }
+
+  equal "route_target" {
+    description = "route_target"
+    got         = data.nxos_evpn_vni_route_target.rtctrlRttEntry_import_auto.route_target
+    want        = "route-target:unknown:0:0"
   }
 }

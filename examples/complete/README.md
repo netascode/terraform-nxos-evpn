@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# NX-OS NVE Interface Example
+# NX-OS EVPN Example
 
 To run this example you need to execute:
 

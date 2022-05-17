@@ -3,7 +3,7 @@ version: '>= 0.14.0'
 formatter: markdown table
 
 content: |-
-  # NX-OS NVE Interface Example
+  # NX-OS EVPN Example
 
   To run this example you need to execute:
 

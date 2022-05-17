@@ -9,6 +9,8 @@ locals {
       "value"       = value.route_distinguisher
     }
   }
+
+  # loop for resource "nxos_evpn_vni"
   rd_dme_format_map = {
     for k, v in local.rd_helper : k => v.format_none ? "unknown:unknown:0:0" : (
       v.format_auto ? "rd:unknown:0:0" : (
@@ -18,10 +20,8 @@ locals {
     ))))
   }
 
-
   vni_with_defaults = {
     for value in var.vnis : value.vni => {
-      "route_distinguisher"    = value.route_distinguisher
       "route_target_both_auto" = value.route_target_both_auto != null ? value.route_target_both_auto : false
       "route_target_import"    = value.route_target_import != null ? value.route_target_import : []
       "route_target_export"    = value.route_target_export != null ? value.route_target_export : []
@@ -31,7 +31,6 @@ locals {
   # add RT "auto" to import/export lists
   vni_raw = {
     for key, value in local.vni_with_defaults : key => {
-      "route_distinguisher"          = value.route_distinguisher
       "route_target_import_list_raw" = value.route_target_both_auto ? concat(["auto"], value.route_target_import) : value.route_target_import
       "route_target_export_list_raw" = value.route_target_both_auto ? concat(["auto"], value.route_target_export) : value.route_target_export
     }
@@ -125,7 +124,7 @@ resource "nxos_evpn_vni_route_target_direction" "rtctrlRttP" {
   direction = each.value.direction
 
   depends_on = [
-    nxos_evpn.rtctrlL2Evpn
+    nxos_evpn_vni.rtctrlBDEvi
   ]
 }
 
