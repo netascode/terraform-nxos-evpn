@@ -12,7 +12,7 @@ Model Documentation: [Link](https://developer.cisco.com/docs/cisco-nexus-3000-an
 ```hcl
 module "nxos_evpn" {
   source  = "netascode/evpn/nxos"
-  version = ">= 0.1.0"
+  version = ">= 0.2.0"
 
   vnis = [
     {
@@ -34,7 +34,7 @@ module "nxos_evpn" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | >= 0.3.12 |
 
 ## Providers
@@ -48,7 +48,7 @@ module "nxos_evpn" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_device"></a> [device](#input\_device) | A device name from the provider configuration. | `string` | `null` | no |
-| <a name="input_vnis"></a> [vnis](#input\_vnis) | EVPN VNI List.<br>  Allowed formats `route_distinguisher`: `auto`, `1.1.1.1:1`, `65535:1`."<br>  Allowed formats `route_target_import`: `auto`, `1.1.1.1:1`, `65535:1`."<br>  Allowed formats `route_target_export`: `auto`, `1.1.1.1:1`, `65535:1`." | <pre>list(object({<br>    vni                    = number<br>    route_distinguisher    = optional(string)<br>    route_target_both_auto = optional(bool)<br>    route_target_import    = optional(list(string))<br>    route_target_export    = optional(list(string))<br>  }))</pre> | `[]` | no |
+| <a name="input_vnis"></a> [vnis](#input\_vnis) | EVPN VNI List.<br>  Allowed formats `route_distinguisher`: `auto`, `1.1.1.1:1`, `65535:1`."<br>  Allowed formats `route_target_import`: `auto`, `1.1.1.1:1`, `65535:1`."<br>  Allowed formats `route_target_export`: `auto`, `1.1.1.1:1`, `65535:1`." | <pre>list(object({<br>    vni                    = number<br>    route_distinguisher    = optional(string)<br>    route_target_both_auto = optional(bool, false)<br>    route_target_import    = optional(list(string), [])<br>    route_target_export    = optional(list(string), [])<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 

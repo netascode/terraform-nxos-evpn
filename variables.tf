@@ -14,9 +14,9 @@ variable "vnis" {
   type = list(object({
     vni                    = number
     route_distinguisher    = optional(string)
-    route_target_both_auto = optional(bool)
-    route_target_import    = optional(list(string))
-    route_target_export    = optional(list(string))
+    route_target_both_auto = optional(bool, false)
+    route_target_import    = optional(list(string), [])
+    route_target_export    = optional(list(string), [])
   }))
   default = []
 

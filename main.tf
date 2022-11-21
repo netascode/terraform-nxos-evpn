@@ -22,9 +22,9 @@ locals {
 
   vni_with_defaults = {
     for value in var.vnis : value.vni => {
-      "route_target_both_auto" = value.route_target_both_auto != null ? value.route_target_both_auto : false
-      "route_target_import"    = value.route_target_import != null ? value.route_target_import : []
-      "route_target_export"    = value.route_target_export != null ? value.route_target_export : []
+      "route_target_both_auto" = value.route_target_both_auto
+      "route_target_import"    = value.route_target_import
+      "route_target_export"    = value.route_target_export
     }
   }
 

@@ -1,6 +1,6 @@
 module "nxos_evpn" {
   source  = "netascode/evpn/nxos"
-  version = ">= 0.1.0"
+  version = ">= 0.2.0"
 
   vnis = [
     {
