@@ -35,13 +35,13 @@ module "nxos_evpn" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | >= 0.3.12 |
+| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | >= 0.5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_nxos"></a> [nxos](#provider\_nxos) | >= 0.3.12 |
+| <a name="provider_nxos"></a> [nxos](#provider\_nxos) | >= 0.5.0 |
 
 ## Inputs
 
@@ -60,8 +60,8 @@ module "nxos_evpn" {
 
 | Name | Type |
 |------|------|
-| [nxos_evpn.rtctrlL2Evpn](https://registry.terraform.io/providers/netascode/nxos/latest/docs/resources/evpn) | resource |
-| [nxos_evpn_vni.rtctrlBDEvi](https://registry.terraform.io/providers/netascode/nxos/latest/docs/resources/evpn_vni) | resource |
-| [nxos_evpn_vni_route_target.rtctrlRttEntry](https://registry.terraform.io/providers/netascode/nxos/latest/docs/resources/evpn_vni_route_target) | resource |
-| [nxos_evpn_vni_route_target_direction.rtctrlRttP](https://registry.terraform.io/providers/netascode/nxos/latest/docs/resources/evpn_vni_route_target_direction) | resource |
+| [nxos_evpn.rtctrlL2Evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn) | resource |
+| [nxos_evpn_vni.rtctrlBDEvi](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni) | resource |
+| [nxos_evpn_vni_route_target.rtctrlRttEntry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target) | resource |
+| [nxos_evpn_vni_route_target_direction.rtctrlRttP](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target_direction) | resource |
 <!-- END_TF_DOCS -->
